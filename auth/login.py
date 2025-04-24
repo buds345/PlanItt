@@ -11,8 +11,11 @@ def login_user(email, password):
     matching_users = users_ref.where("email", "==", email).where("password", "==", hashed_pw).stream()
 
     for user in matching_users:
-        print(f"✅ Welcome back, {user.to_dict()['username']}!")
-        return True
+        user_data = user.to_dict()
+        user_data['id'] = user.id  # Save Firestore document ID if needed
+        print(f"✅ Welcome back, {user_data['username']}!")
+        return user_data  # Return user data instead of just True
 
     print("❌ Invalid email or password.")
-    return False
+    return None
+
