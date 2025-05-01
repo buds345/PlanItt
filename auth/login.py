@@ -1,4 +1,5 @@
 from firebase.firebase_config import db
+from google.cloud.firestore_v1.base_query import FieldFilter
 import hashlib
 
 def hash_password(password):
@@ -8,7 +9,10 @@ def login_user(email, password):
     users_ref = db.collection("users")
     hashed_pw = hash_password(password)
 
-    matching_users = users_ref.where("email", "==", email).where("password", "==", hashed_pw).stream()
+    matching_users = users_ref.where(filter=FieldFilter("email", "==", email)).where(
+    filter=FieldFilter("password", "==", hashed_pw)
+    ).stream()
+
 
     for user in matching_users:
         user_data = user.to_dict()

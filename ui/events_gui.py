@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from firebase.firebase_config import db
 from tkcalendar import DateEntry
+from schedule import SchedulePage
 
 def launch_events_gui(user_data):
     app = EventDashboard(user_data)
@@ -40,8 +41,12 @@ class EventDashboard(ctk.CTkFrame):
 
 
         ctk.CTkButton(self, text="Create Event", command=self.choose_event_type).pack(pady=10)
-
+        ctk.CTkButton(self, text="Manage Schedule", command=lambda: self.open_schedule(event_id)).pack(pady=10)
         self.load_events()
+
+    def open_schedule(self, event_id):
+        self.destroy()
+        SchedulePage(self.master, event_id)
        
     def edit_event(self):
         selected = self.tree.selection()
