@@ -45,8 +45,29 @@ class EventDashboard(ctk.CTkFrame):
 
 
         ctk.CTkButton(self, text="Create Event", command=self.choose_event_type).pack(pady=10)
-        ctk.CTkButton(self, text="Manage Schedule", command=lambda: self.open_schedule(event_id)).pack(pady=10)
+        ctk.CTkButton(self, text="Manage Schedule", command=self.manage_schedule).pack(pady=10)
         self.load_events()
+    #Schedule
+    def manage_schedule(self):
+        selected = self.tree.selection()
+        if not selected:
+            messagebox.showwarning("Warning", "Please select an event to manage the schedule.")
+            return
+
+        item_id = selected[0]
+        event_id = self.event_ids.get(item_id)
+        if not event_id:
+            messagebox.showerror("Error", "Event ID not found.")
+            return
+
+        self.open_schedule(event_id)
+    def open_schedule(self, event_id):
+        self.destroy()
+        def back_to_dashboard():
+            EventDashboard(self.master, self.user_data)
+
+        SchedulePage(self.master, event_id, back_callback=back_to_dashboard)
+       
     
     def manage_guests(self):
         selected = self.tree.selection()
@@ -60,11 +81,6 @@ class EventDashboard(ctk.CTkFrame):
         # Load guest management interface for the selected event
         self.clear_window()
         GuestManager(self, event_id)
-
-
-    def open_schedule(self, event_id):
-        self.destroy()
-        SchedulePage(self.master, event_id)
        
     def edit_event(self):
         selected = self.tree.selection()
