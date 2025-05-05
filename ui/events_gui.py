@@ -6,6 +6,8 @@ from tkinter import ttk, messagebox
 from firebase.firebase_config import db
 from tkcalendar import DateEntry
 from schedule import SchedulePage
+from ui.guest_gui import GuestManager
+
 
 def launch_events_gui(user_data):
     app = EventDashboard(user_data)
@@ -36,30 +38,33 @@ class EventDashboard(ctk.CTkFrame):
 
         self.edit_btn = ctk.CTkButton(btn_frame, text="Edit Selected", command=self.edit_event)
         self.delete_btn = ctk.CTkButton(btn_frame, text="Delete Selected", command=self.delete_event)
+        self.guests_btn = ctk.CTkButton(btn_frame, text="Manage Guests", command=self.manage_guests)
         self.edit_btn.pack(side="left", padx=10)
         self.delete_btn.pack(side="left", padx=10)
+        self.guests_btn.pack(side="left", padx=10)
 
 
         ctk.CTkButton(self, text="Create Event", command=self.choose_event_type).pack(pady=10)
-        ctk.CTkButton(self, text="Manage Schedule", command=self.handle_manage_schedule).pack(pady=10)
-
+        ctk.CTkButton(self, text="Manage Schedule", command=lambda: self.open_schedule(event_id)).pack(pady=10)
         self.load_events()
+    
+    def manage_guests(self):
+        selected = self.tree.selection()
+        if not selected:
+            messagebox.showwarning("Warning", "Please select an event to manage guests.")
+            return
+
+        item_id = selected[0]
+        event_id = self.event_ids[item_id]
+
+        # Load guest management interface for the selected event
+        self.clear_window()
+        GuestManager(self, event_id)
+
 
     def open_schedule(self, event_id):
         self.destroy()
         SchedulePage(self.master, event_id)
-
-    def handle_manage_schedule(self):
-       selected = self.tree.selection()
-       if not selected:
-           messagebox.showwarning("Warning", "Please select an event to manage its schedule.")
-           return
-
-       item_id = selected[0]
-       event_id = self.event_ids[item_id]
-       self.open_schedule(event_id)
- 
-
        
     def edit_event(self):
         selected = self.tree.selection()
@@ -236,3 +241,4 @@ class EventDashboard(ctk.CTkFrame):
     def clear_window(self):
         for widget in self.winfo_children():
             widget.destroy()
+
