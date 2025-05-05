@@ -41,12 +41,25 @@ class EventDashboard(ctk.CTkFrame):
 
 
         ctk.CTkButton(self, text="Create Event", command=self.choose_event_type).pack(pady=10)
-        ctk.CTkButton(self, text="Manage Schedule", command=lambda: self.open_schedule(event_id)).pack(pady=10)
+        ctk.CTkButton(self, text="Manage Schedule", command=self.handle_manage_schedule).pack(pady=10)
+
         self.load_events()
 
     def open_schedule(self, event_id):
         self.destroy()
         SchedulePage(self.master, event_id)
+
+    def handle_manage_schedule(self):
+       selected = self.tree.selection()
+       if not selected:
+           messagebox.showwarning("Warning", "Please select an event to manage its schedule.")
+           return
+
+       item_id = selected[0]
+       event_id = self.event_ids[item_id]
+       self.open_schedule(event_id)
+ 
+
        
     def edit_event(self):
         selected = self.tree.selection()

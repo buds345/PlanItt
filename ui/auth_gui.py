@@ -11,7 +11,6 @@ from auth.register import register_user
 from auth.login import login_user
 from events_gui import EventDashboard
 
-
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")  # Optional custom theme later
 
@@ -65,15 +64,18 @@ class AuthApp(ctk.CTk):
         email = self.email_entry.get()
         password = self.password_entry.get()
         user = login_user(email, password)
-        if user:
+
+        if user == "unverified":
+            messagebox.showwarning("Verify Email", "Please verify your email before logging in.")
+        elif user:
             messagebox.showinfo("Success", "Login successful!")
             self.show_event_dashboard(user)
         else:
             messagebox.showerror("Error", "Invalid credentials.")
-    
+
     def show_event_dashboard(self, user_data):
         self.clear_ui()
-        self.dashboard = EventDashboard(self, user_data)    
+        self.dashboard = EventDashboard(self, user_data)
 
     def handle_register(self):
         name = self.name_entry.get()
