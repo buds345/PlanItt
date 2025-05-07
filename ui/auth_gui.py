@@ -1,11 +1,13 @@
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import customtkinter as ctk
 from tkinter import messagebox
+from PIL import Image
+from customtkinter import CTkImage
+import threading
 
 from auth.register import register_user
 from auth.login import login_user
@@ -17,6 +19,15 @@ ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")  # Optional custom theme later
 
 class AuthApp(ctk.CTk):
+    def show_splash_screen(self):
+        self.clear_ui()
+
+        logo_image = CTkImage(Image.open("ui/Logo.png"), size=(300, 300))
+        ctk.CTkLabel(self, image=logo_image, text="").pack(expand=True)
+
+        # Automatically switch to login UI after 2.5 seconds (2500 ms)
+        self.after(2500, self.build_login_ui)
+
     def __init__(self):
         super().__init__()
 
@@ -25,14 +36,15 @@ class AuthApp(ctk.CTk):
         self.resizable(True, True)
 
         self.mode = "login"
-        self.build_login_ui()
+        self.configure(fg_color="#FFB6C1")  # Peach background
+        self.show_splash_screen()
 
     def build_profile_ui(self):
         self.clear_ui()
 
         ctk.CTkLabel(self, text="Profile", font=("Segoe UI", 22)).pack(pady=20)
 
-        name = self.logged_in_user.get("username", "No Name")
+        name = self.logged_in_user.get("name", "No Name")
         user_email = self.logged_in_user.get("email", "No Email")
 
         ctk.CTkLabel(self, text=f"Name: {name}").pack(pady=10)
@@ -135,62 +147,95 @@ class AuthApp(ctk.CTk):
 
     def build_login_ui(self):
         self.clear_ui()
-        ctk.CTkLabel(self, text="Sign In", font=("Segoe UI", 22)).pack(pady=20)
 
-        self.email_entry = ctk.CTkEntry(self, placeholder_text="Email")
-        self.email_entry.pack(pady=10)
+        # Create the "Sign In" label and center it in the window
+        ctk.CTkLabel(self, text="Sign In", font=("Segoe UI", 22), text_color="black").pack(pady=(200, 10), anchor="center")  # Added top padding for vertical centering
 
-        self.password_entry = ctk.CTkEntry(self, placeholder_text="Password", show="*")
-        self.password_entry.pack(pady=10)
+        # Create and pack the email entry widget
+        self.email_entry = ctk.CTkEntry(self, placeholder_text="Email", width=300, height=40)
+        self.email_entry.pack(pady=10, anchor="center")  # Center horizontally
 
-        ctk.CTkButton(self, text="Login", command=self.handle_login, fg_color="#ff007f").pack(pady=20)
+        # Create and pack the password entry widget
+        self.password_entry = ctk.CTkEntry(self, placeholder_text="Password", show="*", width=300, height=40)
+        self.password_entry.pack(pady=10, anchor="center")  # Center horizontally
 
-        ctk.CTkButton(self, text="No account? Register", command=self.build_register_ui, fg_color="transparent", border_color="#ff007f", border_width=2, text_color="#ff007f").pack()
+        # Create and pack the login button
+        ctk.CTkButton(self, text="Login", command=self.handle_login, fg_color="#ff007f").pack(pady=20, anchor="center")  # Center horizontally
+
+        # Create and pack the register button
+        ctk.CTkButton(self, text="No account? Register", command=self.build_register_ui, fg_color="transparent", border_color="#ff007f", border_width=2, text_color="#ff007f").pack(pady=10, anchor="center")  # Center horizontally
 
     def build_register_ui(self):
         self.clear_ui()
-        ctk.CTkLabel(self, text="Register", font=("Segoe UI", 22)).pack(pady=20)
 
-        self.name_entry = ctk.CTkEntry(self, placeholder_text="Name")
-        self.name_entry.pack(pady=10)
+        # Create the "Register" label and center it in the window
+        ctk.CTkLabel(self, text="Register", font=("Segoe UI", 22), text_color="black").pack(pady=(200, 10), anchor="center")  # Added top padding for vertical centering
 
-        self.email_entry = ctk.CTkEntry(self, placeholder_text="Email")
-        self.email_entry.pack(pady=10)
+        # Create and pack the name entry widget
+        self.name_entry = ctk.CTkEntry(self, placeholder_text="Name", width=300, height=40)
+        self.name_entry.pack(pady=10, anchor="center")  # Center horizontally
 
-        self.password_entry = ctk.CTkEntry(self, placeholder_text="Password", show="*")
-        self.password_entry.pack(pady=10)
+        # Create and pack the email entry widget
+        self.email_entry = ctk.CTkEntry(self, placeholder_text="Email", width=300, height=40)
+        self.email_entry.pack(pady=10, anchor="center")  # Center horizontally
 
-        ctk.CTkButton(self, text="Register", command=self.handle_register, fg_color="#ff007f").pack(pady=20)
+        # Create and pack the password entry widget
+        self.password_entry = ctk.CTkEntry(self, placeholder_text="Password", show="*", width=300, height=40)
+        self.password_entry.pack(pady=10, anchor="center")  # Center horizontally
 
-        ctk.CTkButton(self, text="Already registered? Sign In", command=self.build_login_ui, fg_color="transparent", border_color="#ff007f", border_width=2, text_color="#ff007f").pack()
+        # Create and pack the register button
+        ctk.CTkButton(self, text="Register", command=self.handle_register, fg_color="#ff007f").pack(pady=20, anchor="center")  # Center horizontally
+
+        # Create and pack the sign-in button
+        ctk.CTkButton(self, text="Already registered? Sign In", command=self.build_login_ui, fg_color="transparent", border_color="#ff007f", border_width=2, text_color="#ff007f").pack(pady=10, anchor="center")  # Center horizontally
 
     def handle_login(self):
-        email = self.email_entry.get()
-        password = self.password_entry.get()
-        user = login_user(email, password)
+        def login_thread():
+            email = self.email_entry.get()
+            password = self.password_entry.get()
 
-        if user == "unverified":
-            messagebox.showwarning("Verify Email", "Please verify your email before logging in.")
-        elif user:
-            messagebox.showinfo("Success", "Login successful!")
-            self.show_event_dashboard(user)
-        else:
-            messagebox.showerror("Error", "Invalid credentials.")
+            try:
+                user = login_user(email, password)
+                if user == "unverified":
+                    self.after(0, lambda: messagebox.showwarning("Verify Email", "Please verify your email before logging in."))
+                elif user:
+                    self.logged_in_user = user
+                    self.after(0, lambda: [
+                        messagebox.showinfo("Success", "Login successful!"),
+                        self.show_event_dashboard(user)
+                    ])
+                else:
+                    self.after(0, lambda: messagebox.showerror("Error", "Invalid credentials."))
+            except Exception as e:
+                self.after(0, lambda: messagebox.showerror("Login Error", f"An error occurred: {e}"))
+
+        threading.Thread(target=login_thread).start()
 
     def show_event_dashboard(self, user_data):
         self.clear_ui()
         self.dashboard = EventDashboard(self, user_data)
 
     def handle_register(self):
-        name = self.name_entry.get()
-        email = self.email_entry.get()
-        password = self.password_entry.get()
-        if register_user(name, email, password):
-            messagebox.showinfo("Success", "Registration successful!")
-            self.build_login_ui()
-        else:
-            messagebox.showerror("Error", "Registration failed.")
+        def register_thread():
+            name = self.name_entry.get()
+            email = self.email_entry.get()
+            password = self.password_entry.get()
+
+            try:
+                success = register_user(name, email, password)
+                if success:
+                    self.after(0, lambda: [
+                        messagebox.showinfo("Success", "Registration successful!"),
+                        self.build_login_ui()
+                    ])
+                else:
+                    self.after(0, lambda: messagebox.showerror("Error", "Registration failed."))
+            except Exception as e:
+                self.after(0, lambda: messagebox.showerror("Error", f"An error occurred: {e}"))
+
+        threading.Thread(target=register_thread).start()
 
 if __name__ == "__main__":
     app = AuthApp()
     app.mainloop()
+
