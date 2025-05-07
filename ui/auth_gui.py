@@ -32,7 +32,7 @@ class AuthApp(ctk.CTk):
 
         ctk.CTkLabel(self, text="Profile", font=("Segoe UI", 22)).pack(pady=20)
 
-        name = self.logged_in_user.get("name", "No Name")
+        name = self.logged_in_user.get("username", "No Name")
         user_email = self.logged_in_user.get("email", "No Email")
 
         ctk.CTkLabel(self, text=f"Name: {name}").pack(pady=10)
