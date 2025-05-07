@@ -42,19 +42,42 @@ class AuthApp(ctk.CTk):
     def build_profile_ui(self):
         self.clear_ui()
 
-        ctk.CTkLabel(self, text="Profile", font=("Segoe UI", 22)).pack(pady=20)
+    # Set soft background color
+        self.configure(bg_color="#fff5f7")  # Light background
 
-        name = self.logged_in_user.get("name", "No Name")
+    # Title
+        ctk.CTkLabel(self, text="Profile", font=("Segoe UI Semibold", 28), text_color="#c2185b").pack(pady=(40, 10))
+
+    # User info
+        name = self.logged_in_user.get("username", "No Name")
         user_email = self.logged_in_user.get("email", "No Email")
 
-        ctk.CTkLabel(self, text=f"Name: {name}").pack(pady=10)
-        ctk.CTkLabel(self, text=f"Email: {user_email}").pack(pady=10)
+        ctk.CTkLabel(self, text=f"Name: {name}", font=("Segoe UI", 18), text_color="#4a148c").pack(pady=5)
+        ctk.CTkLabel(self, text=f"Email: {user_email}", font=("Segoe UI", 18), text_color="#4a148c").pack(pady=5)
 
-        ctk.CTkButton(self, text="Edit Profile", command=self.edit_profile_ui).pack(pady=20)
-        ctk.CTkButton(self, text="Back to Dashboard", command=lambda: self.show_event_dashboard(self.logged_in_user), fg_color="transparent", border_color="#ff007f", border_width=2, text_color="#ff007f").pack()
+    # Shared style for buttons
+        button_style = {
+        "font": ("Segoe UI", 16),
+        "corner_radius": 12,
+        "width": 320,
+        "height": 40
+    }
 
-        ctk.CTkButton(self, text="Log Out", command=self.logout_user, fg_color="red").pack(pady=10)
-        ctk.CTkButton(self, text="Delete Account", command=self.delete_account, fg_color="darkred").pack(pady=10)
+    # Buttons
+        ctk.CTkButton(self, text="Edit Profile", command=self.edit_profile_ui,
+                  fg_color="#f48fb1", hover_color="#f06292", text_color="white", **button_style).pack(pady=(25, 10))
+
+        ctk.CTkButton(self, text="Back to Dashboard", command=lambda: self.show_event_dashboard(self.logged_in_user),
+                  fg_color="white", text_color="#c2185b", border_color="#c2185b", border_width=2,
+                  hover_color="#fce4ec", **button_style).pack(pady=5)
+
+        ctk.CTkButton(self, text="Log Out", command=self.logout_user,
+                  fg_color="#e57373", hover_color="#ef5350", text_color="white", **button_style).pack(pady=5)
+
+        ctk.CTkButton(self, text="Delete Account", command=self.delete_account,
+                  fg_color="#c62828", hover_color="#b71c1c", text_color="white", **button_style).pack(pady=(5, 30))
+
+
 
     def edit_profile_ui(self):
         self.clear_ui()
