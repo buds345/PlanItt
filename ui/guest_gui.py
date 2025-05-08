@@ -7,8 +7,6 @@ from utils.email_sender import send_invite_email
 import uuid  
 from datetime import datetime
 
-
-
 class GuestManager(ctk.CTkFrame):
     def __init__(self, master, event_id):
         super().__init__(master)
@@ -18,11 +16,14 @@ class GuestManager(ctk.CTkFrame):
         self.build_ui()
 
     def build_ui(self):
-        ctk.CTkLabel(self, text="Guest List", font=("Segoe UI", 16)).pack(pady=10)
+        self.configure(fg_color="#FFB6C1")  # Set background color
+
+        ctk.CTkLabel(self, text="Guest List", font=("Segoe UI", 16), text_color="black").pack(pady=10)
 
         self.tree = ttk.Treeview(self, columns=("Name", "Email"), show="headings")
         for col in self.tree["columns"]:
-            self.tree.heading(col, text=col)
+            self.tree.heading(col, text=col, anchor="w")  # left-align heading text
+            self.tree.column(col, anchor="w") 
         self.tree.pack(pady=10, fill="both", expand=True)
 
         form_frame = ctk.CTkFrame(self)
