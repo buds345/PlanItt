@@ -26,6 +26,8 @@ class EventDashboard(ctk.CTkFrame):
         self.build_ui()
 
     def build_ui(self):
+        ctk.CTkButton(self, text="Profile", command=self.master.build_profile_ui).pack(pady=5)
+
         ctk.CTkLabel(self, text=f"Welcome, {self.username}", font=("Segoe UI", 16)).pack(pady=10)
 
         self.tree = ttk.Treeview(self, columns=("Name", "Location", "Date", "Time"), show="headings")
