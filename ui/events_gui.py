@@ -26,8 +26,8 @@ class EventDashboard(ctk.CTkFrame):
         self.build_ui()
 
     def build_ui(self):
-        ctk.CTkButton(self, text="Profile", command=self.master.build_profile_ui).pack(pady=5)
 
+        ctk.CTkButton(self, text="Profile", command=self.master.build_profile_ui).pack(pady=5)
         ctk.CTkLabel(self, text=f"Welcome, {self.username}", font=("Segoe UI", 16)).pack(pady=10)
 
         self.tree = ttk.Treeview(self, columns=("Name", "Location", "Date", "Time"), show="headings")
@@ -177,9 +177,11 @@ class EventDashboard(ctk.CTkFrame):
     def choose_event_type(self):
         self.clear_window()
         ctk.CTkLabel(self, text="Choose Event Type", font=("Segoe UI", 14)).pack(pady=10)
-
+        
         for event_type in ["Birthday", "Wedding", "Conference"]:
             ctk.CTkButton(self, text=event_type, command=lambda t=event_type: self.create_event_form(t)).pack(pady=5)
+            
+        ctk.CTkButton(self, text="Back to Events", command=self.reset_ui).pack(pady=5)
 
     def create_event_form(self, event_type):
         self.clear_window()
