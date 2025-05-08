@@ -5,10 +5,10 @@ from firebase.firebase_config import db
 # Define a custom color theme
 PRIMARY_COLOR = "#4f46e5"  # Indigo
 SECONDARY_COLOR = "#6366f1"  # Light Indigo
-BACKGROUND_COLOR = "#f9fafb"  # Light Gray
+BACKGROUND_COLOR = "transparent"
 TEXT_COLOR = "#1f2937"  # Dark Gray
 ERROR_COLOR = "#dc2626"  # Red
-SCHEDULE_FRAME_COLOR = "#2d2d2d"  # Dark Gray for schedule display area
+SCHEDULE_FRAME_COLOR = "#EAA3AE"
 
 class SchedulePage(ctk.CTkFrame):
     def __init__(self, master, event_id, back_callback):
