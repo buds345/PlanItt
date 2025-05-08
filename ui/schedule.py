@@ -1,6 +1,9 @@
 import customtkinter as ctk
 from tkinter import messagebox
 from firebase.firebase_config import db
+import datetime 
+import functools
+
 
 # Define a custom color theme
 PRIMARY_COLOR = "#4f46e5"  # Indigo
@@ -44,8 +47,8 @@ class SchedulePage(ctk.CTkFrame):
         ctk.CTkButton(self, text="Load Schedule", font=button_font, fg_color=PRIMARY_COLOR, hover_color=SECONDARY_COLOR, command=self.load_schedule, width=20, height=20).pack(pady=5, anchor="center")
 
         # Schedule Frame (Now dark gray)
-        self.schedule_frame = ctk.CTkScrollableFrame(self, width=50, height=40, fg_color=SCHEDULE_FRAME_COLOR, corner_radius=20)
-        self.schedule_frame.pack(pady=20, fill="both", expand=True, anchor="center")
+        self.schedule_frame = ctk.CTkScrollableFrame(self, width=300, height=80, fg_color=SCHEDULE_FRAME_COLOR, corner_radius=20)
+        self.schedule_frame.pack(pady=20,  anchor="center")
 
         self.checkbox_vars = []
 
@@ -54,9 +57,19 @@ class SchedulePage(ctk.CTkFrame):
         activity = self.activity_entry.get()
         notes = self.notes_entry.get()
 
+        try:
+            datetime.datetime.strptime(time_str, "%I:%M %p")  # Format: 10:30 AM
+        except ValueError:
+            messagebox.showerror("Invalid Time", "Please enter time in the format HH:MM AM/PM (e.g., 10:30 AM).")
+            return
+
         if time_str and activity:
-            result = add_schedule_item(self.event_id, time_str, activity, notes)
-            messagebox.showinfo("Success", result)
+            try:
+                result = add_schedule_item(self.event_id, time_str, activity, notes)
+                messagebox.showinfo("Success", result)
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to add schedule item: {e}")
+                return
 
             # Clear input fields
             self.time_entry.delete(0, "end")
@@ -65,7 +78,6 @@ class SchedulePage(ctk.CTkFrame):
 
             # Reload the schedule frame to show the newly added item
             self.load_schedule()
-
         else:
             messagebox.showerror("Error", "Time and activity are required.")
 
@@ -135,4 +147,5 @@ def get_schedule(event_id):
 def delete_schedule_item(doc_id):
     db.collection("schedules").document(doc_id).delete()
     return "Schedule item deleted successfully."
+
 
