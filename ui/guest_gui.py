@@ -3,8 +3,10 @@
 import customtkinter as ctk
 from tkinter import ttk, messagebox
 from firebase.firebase_config import db
-from utils.email_sender import send_invite_email  # Add at the top
-import uuid  # Add at the top
+from utils.email_sender import send_invite_email  
+import uuid  
+from datetime import datetime
+
 
 
 class GuestManager(ctk.CTkFrame):
@@ -114,13 +116,41 @@ class GuestManager(ctk.CTkFrame):
         guest_data = guest_doc.to_dict()
         rsvp_token = guest_data.get("rsvp_token")
 
-        # Construct the RSVP link (assuming you're hosting at http://localhost:5000)
+        # Fetch event details from Firestore
+        event_doc = db.collection("events").document(self.event_id).get()
+        event_data = event_doc.to_dict()
+        event_name = event_data.get("name", "Your Event")
+        event_date = event_data.get("date", "Unknown Date")
+        event_time = event_data.get("time", "Unknown Time")
+        event_location = event_data.get("location", "Unknown Location")
+
+        # Format the date
+        try:
+            parsed_date = datetime.strptime(event_date, "%d/%m/%y")  # Update format if Firestore uses mm/dd/yy
+            formatted_date = parsed_date.strftime("%B %d, %Y")       # e.g., "May 07, 2025"
+        except ValueError:
+            formatted_date = event_date  # fallback to original
+        
+        event_time = event_data.get("time", "Unknown Time")
+
+        # Format the time to 12-hour format with AM/PM
+        try:
+            parsed_time = datetime.strptime(event_time, "%H:%M")  # Assumes "14:30", "09:00", etc.
+            formatted_time = parsed_time.strftime("%I:%M %p")     # e.g., "02:30 PM"
+        except ValueError:
+            formatted_time = event_time  # fallback if format unexpected
+
+        event_datetime = f"{formatted_date} at {formatted_time}"
+
+        # Construct the RSVP link
         rsvp_url = f"http://localhost:5000/rsvp/{rsvp_token}"
 
-        # Send the invite with the RSVP link
-        success = send_invite_email(email, name, self.event_id, "Your Event Name", rsvp_url)
+        # Send the invite with event details
+        success = send_invite_email(email, name, self.event_id, event_name, event_datetime, event_location, rsvp_url)
 
         if success:
             messagebox.showinfo("Success", "Invitation email sent.")
         else:
             messagebox.showerror("Error", "Failed to send invitation.")
+
+
