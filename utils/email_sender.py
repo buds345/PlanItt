@@ -7,18 +7,23 @@ from email.mime.multipart import MIMEMultipart
 SENDER_EMAIL = "nesthub040@gmail.com"
 SENDER_PASSWORD = "ayuk rpad jufv dlns"  # Use App Passwords for Gmail
 
-def send_invite_email(to_email, guest_name, event_id, event_name, rsvp_url):
+def send_invite_email(to_email, guest_name, event_id, event_name, event_date, event_location, rsvp_url):
     subject = f"You're Invited to {event_name}!"
     body = f"""
     Hello {guest_name},
 
     You are invited to {event_name}!
 
+    📅 Date & Time: {event_date}
+    
+    📍 Location: {event_location}
+
     Please RSVP by clicking the link below:
     {rsvp_url}
 
     Thank you!
     """
+
 
     message = MIMEMultipart("alternative")
     message["Subject"] = subject
