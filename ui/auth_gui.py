@@ -8,6 +8,8 @@ from tkinter import messagebox
 from PIL import Image
 from customtkinter import CTkImage
 import threading
+from dashboard import DashboardPage
+
 
 from auth.register import register_user
 from auth.login import login_user
@@ -22,7 +24,7 @@ class AuthApp(ctk.CTk):
     def show_splash_screen(self):
         self.clear_ui()
 
-        logo_image = CTkImage(Image.open("ui/Logo.png"), size=(300, 300))
+        logo_image = CTkImage(Image.open("ui/Logo.png"), size=(400, 400))
         ctk.CTkLabel(self, image=logo_image, text="").pack(expand=True)
 
         # Automatically switch to login UI after 2.5 seconds (2500 ms)
@@ -67,7 +69,7 @@ class AuthApp(ctk.CTk):
         ctk.CTkButton(self, text="Edit Profile", command=self.edit_profile_ui,
                   fg_color="#f48fb1", hover_color="#f06292", text_color="white", **button_style).pack(pady=(25, 10))
 
-        ctk.CTkButton(self, text="Back to Dashboard", command=lambda: self.show_event_dashboard(self.logged_in_user),
+        ctk.CTkButton(self, text="Back to Dashboard", command=lambda: self.show_dashboard_page(self.logged_in_user),
                   fg_color="white", text_color="#c2185b", border_color="#c2185b", border_width=2,
                   hover_color="#fce4ec", **button_style).pack(pady=5)
 
@@ -225,7 +227,7 @@ class AuthApp(ctk.CTk):
                     self.logged_in_user = user
                     self.after(0, lambda: [
                         messagebox.showinfo("Success", "Login successful!"),
-                        self.show_event_dashboard(user)
+                        self.show_dashboard_page(user) #changed to show_dashboard_page
                     ])
                 else:
                     self.after(0, lambda: messagebox.showerror("Error", "Invalid credentials."))
@@ -237,6 +239,31 @@ class AuthApp(ctk.CTk):
     def show_event_dashboard(self, user_data):
         self.clear_ui()
         self.dashboard = EventDashboard(self, user_data)
+
+    def show_dashboard_page(self, user_data):
+        self.clear_ui()
+
+        def go_to_profile():
+            self.build_profile_ui()
+
+        def go_to_create_event():
+            self.show_event_dashboard(user_data)  # You can change this later to a dedicated event creator
+
+        def go_to_events():
+            self.show_event_dashboard(user_data)
+
+        def go_to_schedule():
+            self.show_event_dashboard(user_data)  # Or redirect to a schedule feature if you add one
+
+        navigation = {
+            "profile": go_to_profile,
+            "create_event": go_to_create_event,
+            "events": go_to_events,
+            "schedule": go_to_schedule,
+        }
+
+        self.dashboard = DashboardPage(self, user_data, navigate_callback=navigation)
+
 
     def handle_register(self):
         def register_thread():
