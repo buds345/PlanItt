@@ -26,13 +26,33 @@ class EventDashboard(ctk.CTkFrame):
         self.build_ui()
 
     def build_ui(self):
+        self.configure(fg_color="#FFB6C1")  # Set background color
 
-        ctk.CTkButton(self, text="Profile", command=self.master.build_profile_ui).pack(pady=5)
-        ctk.CTkLabel(self, text=f"Welcome, {self.username}", font=("Segoe UI", 16)).pack(pady=10)
+        # Top frame for X button
+        top_frame = ctk.CTkFrame(self, fg_color="transparent")
+        top_frame.pack(fill="x", pady=(5, 0))
+
+        # X button aligned to the right
+        exit_button = ctk.CTkButton(
+            top_frame,
+            text="X",
+            width=30,
+            height=30,
+            fg_color="red",
+            text_color="white",
+            hover_color="#cc0000",
+            command=lambda: self.master.show_dashboard_page(self.user_data)
+        )
+        exit_button.pack(side="right", padx=10)
+
+        #ctk.CTkButton(self, text="Profile", command=self.master.build_profile_ui).pack(pady=5)
+        ctk.CTkLabel(self, text=f"Let's get you planning, {self.username}!", font=("Segoe UI", 16, "bold"), text_color="black").pack(pady=10)
 
         self.tree = ttk.Treeview(self, columns=("Name", "Location", "Date", "Time"), show="headings")
         for col in self.tree["columns"]:
-            self.tree.heading(col, text=col)
+            self.tree.heading(col, text=col, anchor="w")  # left-align heading text
+            self.tree.column(col, anchor="w")             # left-align column cells
+
         self.tree.pack(pady=10, fill="both", expand=True)
 
         btn_frame = ctk.CTkFrame(self)
@@ -49,6 +69,7 @@ class EventDashboard(ctk.CTkFrame):
         ctk.CTkButton(self, text="Create Event", command=self.choose_event_type).pack(pady=10)
         ctk.CTkButton(self, text="Manage Schedule", command=self.manage_schedule).pack(pady=10)
         self.load_events()
+
     #Schedule
     def manage_schedule(self):
         selected = self.tree.selection()
@@ -176,12 +197,49 @@ class EventDashboard(ctk.CTkFrame):
        
     def choose_event_type(self):
         self.clear_window()
-        ctk.CTkLabel(self, text="Choose Event Type", font=("Segoe UI", 14)).pack(pady=10)
-        
-        for event_type in ["Birthday", "Wedding", "Conference"]:
-            ctk.CTkButton(self, text=event_type, command=lambda t=event_type: self.create_event_form(t)).pack(pady=5)
-            
-        ctk.CTkButton(self, text="Back to Events", command=self.reset_ui).pack(pady=5)
+
+        # Centering wrapper
+        wrapper = ctk.CTkFrame(self, fg_color="transparent")
+        wrapper.pack(expand=True)
+
+        # Title label
+        ctk.CTkLabel(
+            wrapper, text="Choose Event Type", font=("Segoe UI", 16, "bold"), text_color="black"
+        ).pack(pady=10)
+
+        # Event types and their button colors
+        event_types = [
+            {"name": "Birthday", "color": "#FFA3B1"},
+            {"name": "Wedding", "color": "#FFD1DC"},
+            {"name": "Conference", "color": "#D3FFF3"},
+            {"name": "Graduation Party", "color": "#FFE0C1"},
+            {"name": "Other", "color": "#F3C4FB"},
+        ]
+
+        for event in event_types:
+            ctk.CTkButton(
+                wrapper,
+                text=event["name"],
+                command=lambda t=event["name"]: self.create_event_form(t),
+                fg_color=event["color"],
+                hover_color="#f0f0f0",
+                text_color="black",
+                corner_radius=12,
+                width=200
+            ).pack(pady=6)
+
+        # Back button
+        ctk.CTkButton(
+            wrapper,
+            text="Back to Events",
+            command=self.reset_ui,
+            fg_color="#B8EAFF",
+            hover_color="#A0DFFF",
+            text_color="black",
+            corner_radius=12,
+            width=200
+        ).pack(pady=10)
+
 
     def create_event_form(self, event_type):
         self.clear_window()
