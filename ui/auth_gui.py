@@ -189,7 +189,14 @@ class AuthApp(ctk.CTk):
 
         # Create and pack the register button
         ctk.CTkButton(self, text="No account? Register", command=self.build_register_ui, fg_color="transparent", border_color="#ff007f", border_width=2, text_color="#ff007f").pack(pady=10, anchor="center")  # Center horizontally
-
+        ctk.CTkButton(
+    self,
+    text="Forgot password?",
+    command=lambda: send_password_reset(self.email_entry.get()),
+    font=("Segoe UI", 14),
+    fg_color="transparent",
+    text_color="#ff007f",
+).pack(pady=2, anchor="center")
     def build_register_ui(self):
         self.clear_ui()
 
