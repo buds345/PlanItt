@@ -84,7 +84,7 @@ class AuthApp(ctk.CTk):
     def edit_profile_ui(self):
         self.clear_ui()
 
-        ctk.CTkLabel(self, text="Edit Profile", font=("Segoe UI", 22)).pack(pady=20)
+        ctk.CTkLabel(self, text="Edit Profile", text_color="black", font=("Segoe UI", 22)).pack(pady=20)
 
         self.new_name_entry = ctk.CTkEntry(self, placeholder_text="New Name")
         self.new_name_entry.pack(pady=10)
